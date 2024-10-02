@@ -9,14 +9,16 @@ import org.springframework.stereotype.Controller;
 public class WebsocketController
 {
     private final SimpMessagingTemplate messagingTemplate;
+    private final WebSocketSessionManager sessionManager;
 
     //@Aytowired annotation gives the SimpMessagingTemplate utility to the
     //WebsocketController object immediately upon object creation.*/
     //You can think of the SimpMessagingTemplate utility as a megaphone that the
     //WebsocketController object will use to shout messages to endpoints */
     @Autowired
-    public WebsocketController(SimpMessagingTemplate messagingTemplate)
+    public WebsocketController(SimpMessagingTemplate messagingTemplate, WebSocketSessionManager sessionManager)
     {
+        this.sessionManager = sessionManager;
         this.messagingTemplate = messagingTemplate;
     }
 
@@ -31,5 +33,37 @@ public class WebsocketController
         messagingTemplate.convertAndSend("/topic/messages", message);
         System.out.println("Sent message to /topic/messages: " + message.getUser() + ": " + message.getMessage());
     }
+
+    //@MessageMapping listens for WebSocket messages on /connect and /disconnect, then invokes the appropriate methods
+    //when a user joins a session...
+    //connectUser will trigger
+    @MessageMapping("/connect")
+    public void connectUser(String username)
+    {
+        //sessionManager object from WebSocketSessionManager.java...
+        // adds user to activeUsernames from WebSocketSessionManager.java
+        sessionManager.addUsername(username);
+        //sessionManager object from WebSocketSessionManager.java...
+        // blasts updated activeUsernames list from WebSocketSessionManager to endpoints subbed to /topic/active
+        sessionManager.broadcastActiveUsernames();
+        //log that user has joined session
+        System.out.println(username + "connected");
+    }
+
+    //when a user leaves a session...
+    //disconnectUser will trigger
+    @MessageMapping("/disconnect")
+    public void disconnectUser(String username)
+    {
+        //sessionManager object from WebSocketSessionManager.java...
+        // removes user from activeUsernames from WebSocketSessionManager.java
+        sessionManager.removeUsername(username);
+        //sessionManager object from WebSocketSessionManager.java...
+        // blasts updated activeUsernames list from WebSocketSessionManager to endpoints subbed to /topic/active
+        sessionManager.broadcastActiveUsernames();
+        //log that user has departed session
+        System.out.println(username + "disconnected");
+    }
+
 }
 
