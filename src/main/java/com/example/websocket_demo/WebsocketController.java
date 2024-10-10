@@ -26,6 +26,7 @@ public class WebsocketController
     //logs that the message was received
     //sends/broadcasts the received message to subscribed endpoints using messagingTemplate object via convertAndSend
     //logs that the message was sent/broadcast(past tense)
+    //triggers via /app/message
     @MessageMapping("/message")
     public void handleMessage(Message message)
     {
@@ -37,6 +38,7 @@ public class WebsocketController
     //@MessageMapping listens for WebSocket messages on /connect and /disconnect, then invokes the appropriate methods
     //when a user joins a session...
     //connectUser will trigger
+    //triggers via /app/connect
     @MessageMapping("/connect")
     public void connectUser(String username)
     {
@@ -47,11 +49,14 @@ public class WebsocketController
         // blasts updated activeUsernames list from WebSocketSessionManager to endpoints subbed to /topic/active
         sessionManager.broadcastActiveUsernames();
         //log that user has joined session
-        System.out.println(username + "connected");
+        System.out.println(username + " connected");
     }
 
-    //when a user leaves a session...
-    //disconnectUser will trigger
+    //this is what disconnectUser from MyStompClient.java Triggers
+    //the difference between this disconnectUser and the MyStompClient disconnectUser is...
+    //that this disconnectUser listens for /app/disconnect that disconnectUser from MyStompClient sends...
+    //hence the message mapping annotation
+    //triggers via /app/disconnect
     @MessageMapping("/disconnect")
     public void disconnectUser(String username)
     {
@@ -62,7 +67,7 @@ public class WebsocketController
         // blasts updated activeUsernames list from WebSocketSessionManager to endpoints subbed to /topic/active
         sessionManager.broadcastActiveUsernames();
         //log that user has departed session
-        System.out.println(username + "disconnected");
+        System.out.println(username + " disconnected");
     }
 
 }

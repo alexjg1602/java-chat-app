@@ -21,7 +21,9 @@ public class MyStompSessionHandler extends StompSessionHandlerAdapter
     public void afterConnected(StompSession session, StompHeaders connectedHeaders)
     {
         System.out.println("connected");
-        System.out.println("subscribed to /topic/messages");
+        //send /app/connect" and username to broker then the broker will see /app and send to backend controller...
+        //then when the websocket controller sees /connect, connectUser will invoke
+        session.send("/app/connect", username);
         //once session is established, sub to /topic/messages
         session.subscribe("/topic/messages", new StompFrameHandler()
         {
@@ -59,6 +61,8 @@ public class MyStompSessionHandler extends StompSessionHandlerAdapter
                 }
             }
         });
+        System.out.println("subscribed to /topic/messages");
+
     }
     @Override
     //will invoke if session unexpectedly folds
@@ -66,6 +70,5 @@ public class MyStompSessionHandler extends StompSessionHandlerAdapter
     {
         exception.printStackTrace();
     }
-
 
 }

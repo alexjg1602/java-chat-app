@@ -49,7 +49,7 @@ public class MyStompClient
         //8080 has fewer restrictions, more convenient for development
         String url = "ws://localhost:8080/ws";
 
-        //establish session to websocket server URL at port 8080
+        //store the connection to the websocket server in session
         session = stompClient.connectAsync(url, sessionHandler).get();
     }
 
@@ -67,7 +67,12 @@ public class MyStompClient
         {
             e.printStackTrace();
         }
-
     }
+    public void disconnectUser(String username)
+    {
+        session.send("/app/disconnect", username);
+        System.out.println("Disconnected user: " + username);
+    }
+
 }
 
