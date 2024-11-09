@@ -36,7 +36,7 @@ public class WebSocketSessionManager
     //broadcast activeUsernames memory list to endpoints subscribed to /topic/active
     public void broadcastActiveUsernames()
     {
-        messagingTemplate.convertAndSend("/topic/active", activeUsernames);
-        System.out.println("Broadcasting active users to /topic/users");
+        messagingTemplate.convertAndSend("/topic/users", activeUsernames);
+        System.out.println("Broadcasting active users to /topic/users " + activeUsernames);
     }
 }

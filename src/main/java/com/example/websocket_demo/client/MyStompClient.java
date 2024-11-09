@@ -18,11 +18,11 @@ public class MyStompClient
 {
     //holds session between endpoint and Websocket server
     private StompSession session;
-    //holds users name-tag
+
     private String username;
 
     //when MyStompClient object is created...
-    public MyStompClient(String username) throws ExecutionException, InterruptedException {
+    public MyStompClient(MessageListener messageListener, String username) throws ExecutionException, InterruptedException {
         this.username = username;
 
         //message travel path(s) will be stored in an ArrayList
@@ -34,13 +34,13 @@ public class MyStompClient
         //sockJsClient for redundancy
         SockJsClient sockJsClient = new SockJsClient(transports);
         //first try websockets, if connecting via an older browser or network config,
-        // and native websocket support is lacking, sockJsClient will suit*/
+        //or if native websocket support is lacking, sockJsClient will suit*/
         WebSocketStompClient stompClient = new WebSocketStompClient(sockJsClient);
         //convert outgoing and incoming messages (serialization and deserialization) to json
         stompClient.setMessageConverter(new MappingJackson2MessageConverter());
 
         //sessionHandler manages communication like transport errors, frame handling, subscriptions, and payload filtering
-        StompSessionHandler sessionHandler = new MyStompSessionHandler(username);
+        StompSessionHandler sessionHandler = new MyStompSessionHandler(messageListener, username);
         //WebSocket server running locally on port 8080
         //distinction between 8080 and 80...
         //80 is a privileged port and reserved for production
